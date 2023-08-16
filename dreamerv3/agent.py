@@ -123,6 +123,7 @@ class WorldModel(nj.Module):
     self.config = config
     shapes = {k: tuple(v.shape) for k, v in obs_space.items()}
     shapes = {k: v for k, v in shapes.items() if not k.startswith('log_')}
+    print(f"possible shapes: {shapes}")
     self.encoder = nets.MultiEncoder(shapes, **config.encoder, name='enc')
     self.rssm = nets.RSSM(**config.rssm, name='rssm')
     self.heads = {
