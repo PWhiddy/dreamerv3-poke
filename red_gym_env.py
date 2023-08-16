@@ -337,12 +337,12 @@ class RedGymEnv(Env):
         return done
 
     def save_and_print_info(self, done, obs_memory):
-        if self.print_rewards and self.step_count % 500 == 0:
+        if self.print_rewards and (self.step_count % 500 == 250):
             prog_string = f'step: {self.step_count:6d}'
             for key, val in self.progress_reward.items():
                 prog_string += f' {key}: {val:5.2f}'
             prog_string += f' sum: {self.total_reward:5.2f}'
-            print(f'\r{prog_string}', end='', flush=True)
+            print(f'{prog_string}', flush=True)
         
         if self.step_count % 50 == 0:
             plt.imsave(

@@ -39,7 +39,7 @@ def main():
   env_config = {
                 'headless': True, 'save_final_state': True, 'early_stop': False,
                 'action_freq': 24, 'init_state': './has_pokedex_nballs.state', 'max_steps': 1024*4,
-                'print_rewards': True, 'save_video': False, 'fast_video': True, 'session_path': Path(f'session_{str(uuid.uuid4())[:8]}'),
+                'print_rewards': False, 'save_video': False, 'fast_video': True, 'session_path': Path(f'session_{str(uuid.uuid4())[:8]}'),
                 'gb_path': './PokemonRed.gb', 'debug': False, 'sim_frame_dist': 2_000_000.0
   }
   
