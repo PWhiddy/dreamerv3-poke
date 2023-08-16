@@ -3,6 +3,8 @@ import pathlib
 import sys
 import warnings
 from functools import partial as bind
+from pathlib import Path
+import uuid
 
 warnings.filterwarnings('ignore', '.*box bound precision lowered.*')
 warnings.filterwarnings('ignore', '.*using stateful random seeds*')
@@ -19,6 +21,17 @@ __package__ = directory.name
 import embodied
 from embodied import wrappers
 
+from embodied.envs import from_gym
+from red_gym_env import RedGymEnv
+
+def make_poke():
+  env_config = {
+              'headless': True, 'save_final_state': True, 'early_stop': False,
+              'action_freq': 24, 'init_state': './has_pokedex_nballs.state', 'max_steps': 1024*12,
+              'print_rewards': False, 'save_video': False, 'fast_video': True, 'session_path': Path(f'session_{str(uuid.uuid4())[:8]}'),
+              'gb_path': './PokemonRed.gb', 'debug': False, 'sim_frame_dist': 2_000_000.0
+  }
+  return RedGymEnv(env_config)
 
 def main(argv=None):
   from . import agent as agt
@@ -169,6 +182,7 @@ def make_env(config, **overrides):
       'minecraft': 'embodied.envs.minecraft:Minecraft',
       'loconav': 'embodied.envs.loconav:LocoNav',
       'pinpad': 'embodied.envs.pinpad:PinPad',
+      'poke': lambda task: from_gym.FromGym(make_poke(), obs_key="image"),
   }[suite]
   if isinstance(ctor, str):
     module, cls = ctor.split(':')

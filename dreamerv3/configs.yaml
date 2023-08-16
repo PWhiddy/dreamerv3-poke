@@ -153,6 +153,11 @@ atari100k:
   encoder: {mlp_keys: '$^', cnn_keys: 'image'}
   decoder: {mlp_keys: '$^', cnn_keys: 'image'}
 
+poke:
+  task: poke_reward
+  envs.amount: 24
+  run.train_ratio: 32
+
 crafter:
 
   task: crafter_reward
