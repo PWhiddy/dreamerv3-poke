@@ -24,11 +24,13 @@ from embodied import wrappers
 from embodied.envs import from_gym
 from red_gym_env import RedGymEnv
 
+sess_name = str(uuid.uuid4())[:8]
+
 def make_poke():
   env_config = {
               'headless': True, 'save_final_state': True, 'early_stop': False,
-              'action_freq': 24, 'init_state': './has_pokedex_nballs.state', 'max_steps': 1024*12,
-              'print_rewards': False, 'save_video': False, 'fast_video': True, 'session_path': Path(f'session_{str(uuid.uuid4())[:8]}'),
+              'action_freq': 24, 'init_state': './has_pokedex_nballs.state', 'max_steps': 1024*8,
+              'print_rewards': False, 'save_video': False, 'fast_video': True, 'session_path': Path(f'session_{sess_name}'),
               'gb_path': './PokemonRed.gb', 'debug': False, 'sim_frame_dist': 2_000_000.0
   }
   return RedGymEnv(env_config)
