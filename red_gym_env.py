@@ -395,7 +395,7 @@ class RedGymEnv(Env):
         return self.max_level_rew
     
     def get_knn_reward(self):
-        pre_rew = 0.004
+        pre_rew = 0.005
         post_rew = 0.01
         cur_size = self.knn_index.get_current_count()
         base = (self.base_explore if self.levels_satisfied else cur_size) * pre_rew
@@ -416,7 +416,7 @@ class RedGymEnv(Env):
                 if heal_amount > 0.5:
                     print(f'healed: {heal_amount}')
                     self.save_screenshot('healing')
-                self.total_healing_rew += heal_amount * 4
+                self.total_healing_rew += heal_amount * 2
             else:
                 self.died_count += 1
     
