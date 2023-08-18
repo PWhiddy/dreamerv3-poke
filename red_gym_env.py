@@ -5,7 +5,6 @@ import os
 from math import floor, sqrt
 import json
 from pathlib import Path
-from skimage.transform import resize
 import numpy as np
 from einops import rearrange
 import matplotlib.pyplot as plt
@@ -203,7 +202,7 @@ class RedGymEnv(Env):
         self.save_and_print_info(step_limit_reached, obs_memory)
 
         self.step_count += 1
-
+        # really should bump up to 0.5 from 0.1 !
         return (resize(obs_memory, (32, 32, 3), anti_aliasing=True) * 255).astype(np.uint8), new_reward*0.1, False, step_limit_reached, {}
 
 
@@ -395,7 +394,7 @@ class RedGymEnv(Env):
         return self.max_level_rew
     
     def get_knn_reward(self):
-        pre_rew = 0.005
+        pre_rew = 0.006
         post_rew = 0.01
         cur_size = self.knn_index.get_current_count()
         base = (self.base_explore if self.levels_satisfied else cur_size) * pre_rew
@@ -416,7 +415,7 @@ class RedGymEnv(Env):
                 if heal_amount > 0.5:
                     print(f'healed: {heal_amount}')
                     self.save_screenshot('healing')
-                self.total_healing_rew += heal_amount * 2
+                self.total_healing_rew += heal_amount * 1
             else:
                 self.died_count += 1
     
