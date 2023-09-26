@@ -71,7 +71,7 @@ class RedGymEnv(Env):
             WindowEvent.RELEASE_BUTTON_B
         ]
 
-        self.output_shape = (36, 40, 3)
+        self.output_shape = (72, 80, 3)
         self.mem_padding = 2
         self.memory_height = 8
         self.col_steps = 16
@@ -83,7 +83,7 @@ class RedGymEnv(Env):
 
         # Set these in ALL subclasses
         self.action_space = spaces.Discrete(len(self.valid_actions))
-        self.observation_space = spaces.Box(low=0, high=255, shape=(32,32,3),#self.output_full, 
+        self.observation_space = spaces.Box(low=0, high=255, shape=(64,64,3),#self.output_full, 
                 dtype=np.uint8)
 
         head = 'headless' if config['headless'] else 'SDL2'
@@ -141,7 +141,7 @@ class RedGymEnv(Env):
         self.progress_reward = self.get_game_state_reward()
         self.total_reward = sum([val for _, val in self.progress_reward.items()])
         self.reset_count += 1
-        return (resize(self.render(), (32, 32, 3), anti_aliasing=True) * 255).astype(np.uint8), {}
+        return (resize(self.render(), (64, 64, 3), anti_aliasing=True) * 255).astype(np.uint8), {}
     
     def init_knn(self):
         # Declaring index
@@ -208,7 +208,7 @@ class RedGymEnv(Env):
 
         self.step_count += 1
         # really should bump up to 0.5 from 0.1 !
-        return (resize(obs_memory, (32, 32, 3), anti_aliasing=True) * 255).astype(np.uint8), new_reward*0.1, False, step_limit_reached, {}
+        return (resize(obs_memory, (64, 64, 3), anti_aliasing=True) * 255).astype(np.uint8), new_reward*0.1, False, step_limit_reached, {}
 
 
     def run_action_on_emulator(self, action):
@@ -413,8 +413,8 @@ class RedGymEnv(Env):
         return self.max_level_rew
     
     def get_explore_reward(self):
-        pre_rew = 0.002#0.006
-        post_rew = 0.00333#0.01
+        pre_rew = 0.003#0.006
+        post_rew = 0.005#0.01
         cur_size = len(self.seen_coords) # self.knn_index.get_current_count()
         base = (self.base_explore if self.levels_satisfied else cur_size) * pre_rew
         post = (cur_size if self.levels_satisfied else 0) * post_rew
