@@ -10,7 +10,7 @@ from einops import rearrange
 import matplotlib.pyplot as plt
 from skimage.transform import resize
 from pyboy import PyBoy
-import hnswlib
+#import hnswlib
 import mediapy as media
 import pandas as pd
 from gymnasium import Env, spaces
@@ -107,7 +107,8 @@ class RedGymEnv(Env):
         with open(self.init_state, "rb") as f:
             self.pyboy.load_state(f)
 
-        self.init_knn()
+        #self.init_knn()
+        self.init_map_mem()
 
         self.recent_memory = np.zeros((self.output_shape[1]*self.memory_height, 3), dtype=np.uint8)
         
@@ -149,6 +150,9 @@ class RedGymEnv(Env):
         self.knn_index.init_index(
             max_elements=self.num_elements, ef_construction=100, M=16)
 
+    def init_map_mem(self):
+        self.seen_coords = {}
+
     def render(self, reduce_res=True, add_memory=True, update_mem=True):
         game_pixels_render = self.screen.screen_ndarray() # (144, 160, 3)
         if reduce_res:
@@ -183,8 +187,9 @@ class RedGymEnv(Env):
         obs_flat = obs_memory[
             frame_start:frame_start+self.output_shape[0], ...].flatten().astype(np.float32)
 
-        self.update_frame_knn_index(obs_flat)
-            
+        #self.update_frame_knn_index(obs_flat)
+        self.update_seen_coords() 
+
         self.update_heal_reward()
 
         new_reward, new_prog = self.update_reward()
@@ -240,7 +245,8 @@ class RedGymEnv(Env):
             'last_action': action,
             'pcount': self.read_m(0xD163), 'levels': levels, 'ptypes': self.read_party(),
             'hp': self.read_hp_fraction(),
-            'frames': self.knn_index.get_current_count(),
+            'coord_count': len(self.seen_coords),
+            #'frames': self.knn_index.get_current_count(),
             'deaths': self.died_count, 'badge': self.get_badges(),
             'event': self.progress_reward['event'], 'healr': self.total_healing_rew
         })
@@ -264,6 +270,19 @@ class RedGymEnv(Env):
                 self.knn_index.add_items(
                     frame_vec, np.array([self.knn_index.get_current_count()])
                 )
+
+    def update_seen_coords(self):
+        x_pos = self.read_m(0xD362)
+        y_pos = self.read_m(0xD361)
+        map_n = self.read_m(0xD35E)
+        coord_string = f"x:{x_pos} y:{y_pos} m:{map_n}"
+        if self.get_levels_sum() >= 22 and not self.levels_satisfied:
+            self.levels_satisfied = True
+            self.base_explore = len(self.seen_coords)
+            self.seen_coords = {}
+        
+        self.seen_coords[coord_string] = self.step_count
+
 
     def update_reward(self):
         # compute reward
@@ -393,14 +412,14 @@ class RedGymEnv(Env):
         self.max_level_rew = max(self.max_level_rew, scaled)
         return self.max_level_rew
     
-    def get_knn_reward(self):
-        pre_rew = 0.006
-        post_rew = 0.01
-        cur_size = self.knn_index.get_current_count()
+    def get_explore_reward(self):
+        pre_rew = 0.002#0.006
+        post_rew = 0.00333#0.01
+        cur_size = len(self.seen_coords) # self.knn_index.get_current_count()
         base = (self.base_explore if self.levels_satisfied else cur_size) * pre_rew
         post = (cur_size if self.levels_satisfied else 0) * post_rew
         return base + post
-    
+
     def get_badges(self):
         return self.bit_count(self.read_m(0xD356))
 
@@ -458,7 +477,7 @@ class RedGymEnv(Env):
             #'op_poke': self.max_opponent_poke * 800,
             #'money': money * 3,
             #'seen_poke': seen_poke_count * 400,
-            'explore': self.get_knn_reward()
+            'explore': self.get_explore_reward()
         }
         
         return state_scores
