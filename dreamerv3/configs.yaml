@@ -155,8 +155,8 @@ atari100k:
 
 poke:
   task: poke_reward
-  envs.amount: 24
-  run.train_ratio: 8
+  envs.amount: 16
+  run.train_ratio: 16
 
 crafter:
 
