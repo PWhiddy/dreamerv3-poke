@@ -413,8 +413,8 @@ class RedGymEnv(Env):
         return self.max_level_rew
     
     def get_explore_reward(self):
-        pre_rew = 0.003#0.006
-        post_rew = 0.005#0.01
+        pre_rew = 0.006
+        post_rew = 0.01
         cur_size = len(self.seen_coords) # self.knn_index.get_current_count()
         base = (self.base_explore if self.levels_satisfied else cur_size) * pre_rew
         post = (cur_size if self.levels_satisfied else 0) * post_rew
