@@ -155,7 +155,8 @@ atari100k:
 
 poke:
   task: poke_reward
-  seed: 117
+  seed: 2
+  horizon: 500
   envs.amount: 16
   run.train_ratio: 16
 

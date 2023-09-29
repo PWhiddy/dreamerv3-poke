@@ -439,7 +439,9 @@ class RedGymEnv(Env):
                 self.died_count += 1
     
     def get_all_events_reward(self):
-        return max(sum([self.bit_count(self.read_m(i)) for i in range(0xD747, 0xD886)]) - 13, 0)
+        return max(sum(
+            [self.bit_count(self.read_m(i)) for i in range(0xD747, 0xD886)]
+            ) - 13 - int(self.read_bit(0xD754, 0)), 0)
   
     def get_game_state_reward(self, print_stats=False):
         # addresses from https://datacrystal.romhacking.net/wiki/Pok%C3%A9mon_Red/Blue:RAM_map
